@@ -14,13 +14,22 @@
 ### Get started
 
 Clone repo:
-`git clone https://github.com/Gabito0/yodlr-backend.git`
+
+```bash
+git clone https://github.com/Gabito0/yodlr-backend.git
+```
 
 Install dependencies:
-`npm i`
+
+```bash
+npm i
+```
 
 Run server:
-`npm run dev`
+
+```bash
+npm run dev
+```
 
 ### Routes
 
@@ -99,4 +108,7 @@ User Routes handles updating user's information, admins creating a new user with
 #### Testing
 
 To run test:
-`npm run test`
+
+```bash
+npm run test
+```
