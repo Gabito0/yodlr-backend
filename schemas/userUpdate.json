@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "User Schema",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "The email Schema",
+      "examples": ["lilly@getyodlr.com"]
+    },
+    "firstName": {
+      "type": "string",
+      "title": "The firstName Schema",
+      "examples": ["Kyle"]
+    },
+    "lastName": {
+      "type": "string",
+      "title": "The lastName Schema",
+      "examples": ["White"]
+    },
+    "isAdmin": {
+      "type": "boolean",
+      "title": "The isAdmin Schema",
+      "examples": [false]
+    },
+    "state": {
+      "type": "string",
+      "title": "The state Schema",
+      "examples": ["active"]
+    },
+    "newPassword": {
+      "type": "string",
+      "title": "The newPassword Schema",
+      "examples": ["newpassword123"]
+    },
+    "currentPassword": {
+      "type": "string",
+      "title": "The currentPassword Schema",
+      "examples": ["currentpassword123"]
+    }
+  },
+  "required": ["email", "firstName", "lastName", "currentPassword"],
+  "additionalProperties": false
+}

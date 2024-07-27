@@ -1,57 +1,97 @@
-var express = require('express');
-var router = express.Router();
-var _ = require('lodash');
-var logger = require('../lib/logger');
-var log = logger();
+"use strict";
 
-var users = require('../init_data.json').data;
-var curId = _.size(users);
+const express = require("express");
+const router = express.Router();
+const _ = require("lodash");
+const logger = require("../lib/logger");
+const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../middleware/auth");
+const jsonschema = require("jsonschema");
+const userUpdateSchema = require("../schemas/userUpdate.json");
+const log = logger();
+const User = require("../models/user");
+
+const { BadRequestError } = require("../expressError");
 
 /* GET users listing. */
-router.get('/', function(req, res) {
-  res.json(_.toArray(users));
+router.get("/", ensureAdmin, async function (req, res, next) {
+  try {
+    const users = await User.getAllUsers();
+    return res.json({ users });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 /* Create a new user */
-router.post('/', function(req, res) {
-  var user = req.body;
-  user.id = curId++;
-  if (!user.state) {
-    user.state = 'pending';
+router.post("/", ensureAdmin, async function (req, res, next) {
+  try {
+    const { email, firstName, lastName, isAdmin, password, state } = req.body;
+    const user = await User.add({
+      email,
+      firstName,
+      lastName,
+      isAdmin,
+      password,
+      state,
+    });
+
+    log.info("Created user", user);
+    return res.status(201).json({ user });
+  } catch (err) {
+    return next(err);
   }
-  users[user.id] = user;
-  log.info('Created user', user);
-  res.json(user);
 });
 
 /* Get a specific user by id */
-router.get('/:id', function(req, res, next) {
-  var user = users[req.params.id];
-  if (!user) {
-    return next();
+router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  try {
+    const user = await User.getUser(req.params.id);
+    return res.json({ user });
+  } catch (err) {
+    return next(err);
   }
-  res.json(users[req.params.id]);
+});
+
+/** Set user as active */
+router.put("/activate", ensureAdmin, async function (req, res, next) {
+  try {
+    const { id } = req.body;
+    const user = await User.activate(id); // Assuming method is implemented
+    return res.json({ user });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 /* Delete a user by id */
-router.delete('/:id', function(req, res) {
-  var user = users[req.params.id];
-  delete users[req.params.id];
-  res.status(204);
-  log.info('Deleted user', user);
-  res.json(user);
-});
+router.delete(
+  "/:id",
+  ensureCorrectUserOrAdmin,
+  async function (req, res, next) {
+    try {
+      await User.delete(+req.params.id);
+      log.info("Deleted user", { id: req.params.id });
+      return res.status(204).end();
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
 
 /* Update a user by id */
-router.put('/:id', function(req, res, next) {
-  var user = req.body;
-  if (user.id != req.params.id) {
-    return next(new Error('ID paramter does not match body'));
+router.put("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
+  try {
+    const validator = jsonschema.validate(req.body, userUpdateSchema);
+    if (!validator.valid) {
+      const errors = validator.errors.map((e) => e.stack);
+      throw new BadRequestError(errors);
+    }
+    const user = await User.update(req.params.id, req.body);
+    // log.info("Updated user", user);
+    return res.json({ user });
+  } catch (err) {
+    return next(err);
   }
-  users[user.id] = user;
-  log.info('Updating user', user);
-  res.json(user);
 });
-
 
 module.exports = router;
