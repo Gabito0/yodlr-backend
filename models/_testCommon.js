@@ -11,7 +11,7 @@ async function commonBeforeAll() {
   // Add test users with passwords
   await User.add({
     email: "user1@user.com",
-    password: "password1", // Plaintext password for setup; hashed inside the User model
+    password: "password1",
     firstName: "User1",
     lastName: "Last1",
     isAdmin: false,

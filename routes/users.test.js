@@ -170,10 +170,10 @@ describe("PUT /users/:id", function () {
 });
 
 /** PUT /users/activate */
-describe("PUT /users/activate", function () {
+describe("PACTH /users/activate", function () {
   test("works for activating a user", async function () {
     const resp = await request(app)
-      .put("/users/activate")
+      .patch("/users/activate")
       .send({ id: 1 })
       .set("authorization", `Bearer ${adminToken}`);
     expect(resp.statusCode).toEqual(200);
@@ -182,7 +182,7 @@ describe("PUT /users/activate", function () {
 
   test("fails for already active user", async function () {
     const resp = await request(app)
-      .put("/users/activate")
+      .patch("/users/activate")
       .send({ id: 3 })
       .set("authorization", `Bearer ${adminToken}`);
     expect(resp.statusCode).toEqual(400);

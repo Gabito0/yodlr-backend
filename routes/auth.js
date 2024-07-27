@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const _ = require("lodash");
 const logger = require("../lib/logger");
 const log = logger();
 const { createToken } = require("../helpers/tokens");

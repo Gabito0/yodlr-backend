@@ -2,7 +2,6 @@
 
 const express = require("express");
 const router = express.Router();
-const _ = require("lodash");
 const logger = require("../lib/logger");
 const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../middleware/auth");
 const jsonschema = require("jsonschema");
@@ -53,10 +52,10 @@ router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
 });
 
 /** Set user as active */
-router.put("/activate", ensureAdmin, async function (req, res, next) {
+router.patch("/activate", ensureAdmin, async function (req, res, next) {
   try {
     const { id } = req.body;
-    const user = await User.activate(id); // Assuming method is implemented
+    const user = await User.activate(id);
     return res.json({ user });
   } catch (err) {
     return next(err);

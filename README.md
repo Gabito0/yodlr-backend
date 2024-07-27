@@ -1,114 +1,102 @@
-Yodlr Front End Engineer Code/Design Challenge
-=======================
+# Yodlr Backend
 
-Hello!
+---
 
-We're excited that you're interested in joining the [Yodlr](https://getyodlr.com) team.  In the past, we have
-brought potential engineering candidates into our office for a full-day
-technical interview.  This interview would include whiteboard programming
-exercises, code reviews, and other thought exercises.  Unfortunately, onsite technical interviews are often biased against people who are not comfortable being put on the spot.  Not to mention, who _actually_ codes on a whiteboard in real life?  In short,  we realized that we
-were evaluating candidates in an unusual situation.
+**Yodlr backend** is an API designed to manage data flow for both users and administrators.
 
-So instead, we've come up with this relatively open-ended programming/design
-challenge that will allow you to demonstrate your skills from the comfort
-of your own workspace.  In addition, we know your time is valuable, so please
-feel free to use your completed work as a portfolio piece.
+**Tech Stack**
 
-We wish you the best of luck and can't wait to see what you create!
+- PostgreSQL - Datebase
+- Express JS - Web Framework
 
-Thanks,  
-Team Yodlr (Jared, Tom, & Ross)
+---
 
-## Overview
+### Get started
 
-We have provided you with a simple [NodeJS](https://nodejs.org)
-application server for user registration and administration.
-This app does two things:
-* Hosts static content from the 'public' directory
-* Serves a JSON REST API for [CRUD](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations on users stored in memory
+Clone repo:
+`git clone https://github.com/Gabito0/yodlr-backend.git`
 
-We would like for you to build a user interface for user registration and one for administration of existing users.  To get you started, we have created placeholder pages (signup.html and admin.html) that you can build on.
+Install dependencies:
+`npm i`
 
-You may use any front-end technologies you would like to create these user interfaces.  This nodejs application is currently geared towards client-side rendering for systems like AngularJS, BackboneJS, EmberJS, jQuery, etc. but if you are more familiar with server-side templating (Handlebars, Jade, Swig, EJS, etc) please feel free to rework the application as needed.
+Run server:
+`npm run dev`
 
-In terms of design & layout, we leave that entirely up to you.  We are familiar with [Bootstrap](getbootstrap.com) but have also heard great things about [Foundation](foundation.zurb.com).  We recommend using whatever you're most comfortable with.
+### Routes
 
+---
 
-## Getting Started
+##### Auth Routes
 
-To use this application, you will need to download and install [NodeJS](http://nodejs.org/download/).
+Auth routes handles users' being authenticated by using their crendetials or registering for the first time.
 
-Once you have NodeJS installed, you have two choices for downloading this source code:
+- Request a token - Send user's credentials, in return for a token if valid credentials.
 
-1. Download & extract a [zip file](https://github.com/yodlr/frontend-code-challenge/archive/master.zip) of the source  
-2. Fork this repository and git clone your fork
+  - method: `post`
+  - `BASE_URL/auth/token`
+  - Required data: `{email, password}`
+  - returns: `{token}`
 
-Next, you need to install the package dependencies by running the following command in the top-level directory of this source tree:
-```
-npm install
-```
+- Register for a token - Registers a new user, in return sends a token.
+- - method: `post`
+  - `BASE_URL/auth/register`
+  - Required data: `{email, password, firstName, lastName}`
+  - returns: `{token}`
 
-Once the dependancies are installed, you can start the application server by running
-```
-npm start
-```
+---
 
-Once the server is running, you can access the start page (index.html) by opening your browser to [http://localhost:3000](http://localhost:3000).
+##### User Routes
 
-To stop the server, press CTRL-C.
+User Routes handles updating user's information, admins creating a new user with admins perks, deleting a user, activating a user, and gettting all user's information.
 
-## REST API
+- Get all users - Gets every single user's information.
 
-The Users JSON REST API is exposed at [http://localhost:3000/users](http://localhost:3000).
+  - method: `get`
+  - authorized: _admin_
+  - `BASE_URL/users`
+  - returns `{users}`
 
-On server start, user data is read into memory from init_data.json. All subsequent actions are done against this memory store.  Stopping and starting the server will re-initialize data from init_data.json.  
+- Create user - Creates a new user with admin perks.
 
-#### API Endpoints
+  - method: `post`
+  - authorized: _admin_
+  - required data: `{email, password, firstName, lastName, isAdmin, state}`
+  - `BASE_URL/users`
+  - returns `{user}`
 
-* **/users**  
-HTTP GET: returns array of all users  
-HTTP POST: creates a new user, returns the created user data
-* **/users/:id**  
-HTTP GET: returns the user with given id (numeric, auto-incrementing).  HTTP 404 if user not found  
-HTTP PUT: updates the user with given id and returns updated record. HTTP 404 if user not fund.  
-HTTP DELETE: removes the users with given id, returns nothing (HTTP 204)
+- Get user - Get user's information by thier id.
 
-Here is an example of results returned from HTTP GET on /users:
-```
-[{"id":1,"email":"kyle@getyodlr.com","firstName":"Kyle","lastName":"White","state":"active"},  
-{"id":2,"email":"jane@getyodlr.com","firstName":"Jane","lastName":"Stone","state":"active"},  
-{"id":3,"email":"lilly@getyodlr.com","firstName":"Lilly","lastName":"Smith","state":"pending"},  
-{"id":4,"email":"fred@getyodlr.com","firstName":"Fred","lastName":"Miles","state":"pending"},  
-{"id":5,"email":"alex@getyodlr.com","firstName":"Alexandra","lastName":"Betts","state":"pending"}]
-```
+  - method: `get`
+  - authorized: _user or admin_
+  - `BASE_URL/users/:id`
+  - returns: `{user}`
 
-## Requirements
+- Activate user - Changes user's `state` to `active`
 
-**We kindly ask that you spend no more than 6-8 hours on this challenge.**
+  - method:`patch`
+  - authorized: _admin_
+  - `BASE_URL/users/activate`
+  - required date: `{id}`
+  - returns: `{user}`
 
-At a minimum, there are three things we would like to see:
-* Users should be able to register
-* Admin page should list all users
-* Design/layout of content
+- Update user's information - Updates user's information
 
-We will of course examine your code for readability, architectural decisions, and modularity.  If/when you meet with us, be prepared to talk about why and how you built your interfaces.
+  - method:`put`
+  - authorized: _user or admin_
+  - `BASE_URL/users/:id`
+  - required data: `{email, currentPassword, firstName, lastName, state}`
+  - optional data: `{newPassword}`
+  - returns: `{user}`
 
-## Idea inspiration
+- Delete user - Deletes a user from the database
+  - method: `delete`
+  - authorized: _user or admin_
+  - `BASE_URL/users/:id`
+  - returns: `undefined`
 
-If you have additional time after completing the requirements (we _think_ you should), then we'd love to see what else you can do.  Here are some ideas to get you started (but please don't limit yourself to these!).
+---
 
-* Experiment with alternative designs (A/B Testing is important for registration!)
-* Signup form validation
-* Automated testing
-* Dynamic data on Admin page (no need to refresh to status changes)
-* Sorting/Searching of users
-* Admin button to activate accounts (set user status to 'active')
-* Admin creation of new accounts
-* Optimize assets (minimize and/or bundle css/js)
-* Authentication/Authorization
+#### Testing
 
-To be perfectly clear, we don't expect that anyone could complete _all_ of these in 6-8 hours.  This is simply a list of ideas to inspire you.
-
-## License
-
-We have licensed this project under the MIT license so that you may use this for a portfolio piece (or anything else!).
+To run test:
+`npm run test`
