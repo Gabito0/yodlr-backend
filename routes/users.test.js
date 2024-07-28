@@ -155,10 +155,6 @@ describe("PUT /users/:id", function () {
         email: "not-an-email",
       })
       .set("authorization", `Bearer ${adminToken}`);
-    console.log(
-      resp.body.error.message,
-      "all the messgaes from updating users"
-    );
     expect(resp.statusCode).toEqual(400);
     expect(resp.body.error.message).toContain(
       'instance requires property "firstName"'

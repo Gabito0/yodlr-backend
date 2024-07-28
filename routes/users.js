@@ -68,7 +68,7 @@ router.delete(
   ensureCorrectUserOrAdmin,
   async function (req, res, next) {
     try {
-      await User.delete(+req.params.id);
+      await User.delete(req.params.id);
       log.info("Deleted user", { id: req.params.id });
       return res.status(204).end();
     } catch (err) {
